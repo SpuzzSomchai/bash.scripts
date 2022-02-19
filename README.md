@@ -24,11 +24,11 @@ chmod +x [filename]
 - To create a new symbolic link, use the following command
 
 ```sh
-ln -s /usr/bin/[command] /srv/scripts/[script file]
+ln -s /srv/scripts/[script file] /usr/bin/[command]
 ```
 
 So for the the service menu that I use to much the command would look like this:
 
 ```sh
-ln -s /usr/bin/sm /srv/scripts/service-menu.sh
+ln -s /srv/scripts/service-menu.sh /usr/bin/sm
 ```
