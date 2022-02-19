@@ -1,0 +1,1 @@
+A small collection of bash scripts I created and use on a daily basis to perform tedious tasks, one I use the most if the service-menu script or sm for short to start, restart, status and inspect Linux services and docker containers

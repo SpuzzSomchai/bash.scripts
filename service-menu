@@ -1,0 +1,108 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+    ACTION="-ss"
+fi
+
+echo ".__ .___.  . __..___.__ .  .   .  ..___"
+echo "|  \[__ \  /(__ [__ [__)\  /   |\/|[__ "
+echo "|__/[___ \/ .__)[___|  \ \/  * |  |[___"
+echo " "
+echo " Start, Restart or Inspect Service or Docker Container"
+echo "┌────────────────────────────────────────────────┐"
+echo "│ -ss	: Start / Stop Service or Container      │"
+echo "│ -r	: Restart Service or Container           │"
+echo "│ -s	: Get the Status of Service or Container │"
+echo "└────────────────────────────────────────────────┘"
+echo " ";
+echo " $ACTION"
+[[ "$ACTION" == "-r" ]] && echo "Select Service / Container to Restart";
+[[ "$ACTION" == "-s" ]] && echo "Select Service / Container Inspect or get Status";
+[[ "$ACTION" == "-ss" ]] && echo "Select Service / Container Start or Stop";
+echo "";
+
+function serviceStartStop {
+   STATUS=$(systemctl status "$1" | grep Active | awk '{print $2}')
+   echo "$1 is currently $STATUS";
+   if [ "$STATUS" == "active" ]; then
+      echo "Stopping Service: $1";
+      systemctl stop "$1" & echo "Done" || echo "failed";
+   elif [ "$STATUS" == "inactive" ]; then
+   	echo "Staring Service: $1"
+      systemctl start "$1" && echo "Done" || echo "failed"
+   elif [ "$STATUS" == "failed" ]; then    
+      echo "See systemctl status $1.service and journalctl -xe for details."     
+      systemctl start "$1" && echo "Done" || echo "failed";
+	   JOURNAL=$(journalctl -xe)
+	   echo "Journal: "
+      echo "$JOURNAL"
+   fi
+   STATUS=$( systemctl status "$1")
+   echo "$STATUS";
+}
+
+function restartService {
+    echo "Restarting $1"
+    systemctl restart "$1"
+    STATUS=$( systemctl status "$1")
+    echo "$STATUS";
+}
+
+function serviceInspect {
+    echo "Getting $1 Status"
+    echo systemctl status "$1"
+}
+
+
+function dockerStartStop {
+   STATUS=$(docker ps -a | grep "$1" | awk '{print $7}' )
+   echo "$1 is currently $STATUS";
+   if [ "$STATUS" == "Up" ]; then
+      echo "Stopping Docker Container: $1";
+      docker stop "$1" & echo "Done" || echo "failed" wait;
+   else 
+      echo "Staring Docker Container: $1";
+      docker start "$1" & echo "Done" || echo "failed" wait;
+   fi
+   STATUS=$(docker ps -a | grep "$1")
+   echo "$STATUS"
+}
+
+function dockerRestart {
+    echo "Restarting $1"
+    echo docker restart "$1"
+    STATUS=$( systemctl status "$1")
+    echo "$STATUS";
+}
+
+function dockerInspect {
+    echo "Inspecting $1 Container"
+    echo docker container inspect "$1"
+}
+
+
+select OPTION in httpd mariadb nginx code-server rstudio-server vault cockpit portainer snippetbox heimdall couch-db_couchserver_1 flamedashboard Monitorr cloud9 linkener EXIT
+do
+	case $OPTION in 
+	httpd|mariadb|nginx|code-server|cockpit|vault)
+		[[ "$ACTION" == "-r" ]] && serviceRestart "$OPTION";
+	    [[ "$ACTION" == "-s" ]] && serviceInspect "$OPTION";
+		[[ "$ACTION" == "-ss" ]] && serviceStartStop "$OPTION";
+		break
+   ;;
+	portainer|snippetbox|heimdall|couch-db_couchserver_1|flamedashboard|Monitorr|cloud9|linkener)
+		[[ "$ACTION" == "-r" ]] && dockerRestart "$OPTION";
+		[[ "$ACTION" == "-s" ]] && dockerInspect "$OPTION";
+		[[ "$ACTION" == "-ss" ]] && dockerStartStop "$OPTION";
+      break;
+   ;;
+   EXIT)
+      break
+   ;;
+
+   *) 
+		echo "That was an invalid option, try agian"
+	;;
+	esac
+done
+

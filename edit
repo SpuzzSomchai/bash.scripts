@@ -1,0 +1,40 @@
+#!/bin/bash
+FILENME="$1"
+if [[ -z $FILENME ]]
+then
+   echo "edit [filename] or '--set-editor to set default editor'"
+
+elif [[ $FILENME == "--set-editor" ]]
+then
+select OPTION in nano vi EXIT
+do
+	case $OPTION in 
+   nano)
+      sed -i "s/export EDITOR='vi'/export EDITOR='nano'" ~/.bashrc
+   ;;
+   vi)
+      sed -i "s/export EDITOR='nano'/export EDITOR='vi'" ~/.bashrc
+   ;;
+   EXIT)
+      break
+   ;;
+
+   *) 
+		echo "That was an invalid option, try agian"
+	;;
+	esac
+done
+else 
+   $EDITOR "$FILENME"
+
+   echo Give brief description of what you updated
+   read $message
+   cd /etc
+   git pull
+   git add "$FILENME"
+   git commit -m \"$message\"
+   git push
+   echo "$FILENME updated with updated desription: $message"
+fi
+
+
