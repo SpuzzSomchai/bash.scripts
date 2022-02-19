@@ -2,24 +2,28 @@
 
 if [ -z $1 ]; then
     ACTION="-ss"
+else
+	ACTION="$1"
 fi
-
+clear;
 echo ".__ .___.  . __..___.__ .  .   .  ..___"
 echo "|  \[__ \  /(__ [__ [__)\  /   |\/|[__ "
 echo "|__/[___ \/ .__)[___|  \ \/  * |  |[___"
 echo " "
-echo " Start, Restart or Inspect Service or Docker Container"
+echo " ";
+[[ "$ACTION" == "-r" ]] && echo "Select Service / Container to Restart";
+[[ "$ACTION" == "-s" ]] && echo "Select Service / Container Inspect or get Status";
+[[ "$ACTION" == "-ss" ]] && echo "Select Service / Container Start or Stop";
 echo "┌────────────────────────────────────────────────┐"
 echo "│ -ss	: Start / Stop Service or Container      │"
 echo "│ -r	: Restart Service or Container           │"
 echo "│ -s	: Get the Status of Service or Container │"
+echo "│ -rs 	: Show all Active and Running Services   │"
+echo "│ -es 	: Show all Active but Exited Services    │"
+echo "│ -rc 	: Show all Active and Running Containers │"
+echo "│ -ec 	: Show all Active but Stopped Containers │"
 echo "└────────────────────────────────────────────────┘"
-echo " ";
-echo " $ACTION"
-[[ "$ACTION" == "-r" ]] && echo "Select Service / Container to Restart";
-[[ "$ACTION" == "-s" ]] && echo "Select Service / Container Inspect or get Status";
-[[ "$ACTION" == "-ss" ]] && echo "Select Service / Container Start or Stop";
-echo "";
+
 
 function serviceStartStop {
    STATUS=$(systemctl status "$1" | grep Active | awk '{print $2}')
@@ -35,22 +39,20 @@ function serviceStartStop {
       systemctl start "$1" && echo "Done" || echo "failed";
 	   JOURNAL=$(journalctl -xe)
 	   echo "Journal: "
-      echo "$JOURNAL"
+       echo "$JOURNAL"
    fi
-   STATUS=$( systemctl status "$1")
-   echo "$STATUS";
+   systemctl status "$1"
 }
 
-function restartService {
+function serviceRestart {
     echo "Restarting $1"
     systemctl restart "$1"
-    STATUS=$( systemctl status "$1")
-    echo "$STATUS";
+	systemctl status "$1"
 }
 
 function serviceInspect {
     echo "Getting $1 Status"
-    echo systemctl status "$1"
+    systemctl status "$1"
 }
 
 
@@ -70,27 +72,30 @@ function dockerStartStop {
 
 function dockerRestart {
     echo "Restarting $1"
-    echo docker restart "$1"
-    STATUS=$( systemctl status "$1")
-    echo "$STATUS";
+    docker restart "$1"
 }
 
 function dockerInspect {
     echo "Inspecting $1 Container"
-    echo docker container inspect "$1"
+    docker container inspect "$1"
 }
 
+[[ "$ACTION" == "-rs" ]] && systemctl list-units --type=service --state=running  --all                  
+[[ "$ACTION" == "-es" ]] && systemctl list-units --type=service --state=exited
+[[ "$ACTION" == "-rc" ]] && docker ps
+[[ "$ACTION" == "-ec" ]] && docker ps --filter "status=exited"
 
-select OPTION in httpd mariadb nginx code-server rstudio-server vault cockpit portainer snippetbox heimdall couch-db_couchserver_1 flamedashboard Monitorr cloud9 linkener EXIT
+
+select OPTION in code-server codiad cloud9 cloudcmd couchDb cockpit dashboard dashmachine dillinger doublecommander droppy flamedashboard heimdall httpd mariadb nginx n8n portainer rstudio-server snippetbox organizr vsc-server EXIT
 do
 	case $OPTION in 
-	httpd|mariadb|nginx|code-server|cockpit|vault)
+	httpd|mariadb|nginx|cloudcmd|code-server|cockpit|vault)
 		[[ "$ACTION" == "-r" ]] && serviceRestart "$OPTION";
 	    [[ "$ACTION" == "-s" ]] && serviceInspect "$OPTION";
 		[[ "$ACTION" == "-ss" ]] && serviceStartStop "$OPTION";
 		break
    ;;
-	portainer|snippetbox|heimdall|couch-db_couchserver_1|flamedashboard|Monitorr|cloud9|linkener)
+	portainer|codiad|droppy|snippetbox|organizr|heimdall|couchDb|dashboard|dashmachine|flamedashboard|cloud9|doublecommander|dillinger|vsc-server)
 		[[ "$ACTION" == "-r" ]] && dockerRestart "$OPTION";
 		[[ "$ACTION" == "-s" ]] && dockerInspect "$OPTION";
 		[[ "$ACTION" == "-ss" ]] && dockerStartStop "$OPTION";
