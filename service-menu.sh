@@ -86,10 +86,10 @@ function dockerInspect {
 [[ "$ACTION" == "-ec" ]] && docker ps --filter "status=exited"
 
 
-select OPTION in code-server codiad cloud9 cloudcmd couchDb cockpit dashboard dashmachine dillinger doublecommander droppy flamedashboard heimdall httpd mariadb nginx n8n portainer rstudio-server snippetbox organizr vsc-server EXIT
+select OPTION in code-server codiad cloud9 cloudcmd couchDb cockpit dashboard dashmachine dillinger doublecommander droppy flamedashboard heimdall httpd mariadb nginx n8n portainer rstudio-server snippetbox organizr vikunja vsc-server EXIT
 do
 	case $OPTION in 
-	httpd|mariadb|nginx|cloudcmd|code-server|cockpit|vault)
+	httpd|mariadb|nginx|cloudcmd|code-server|cockpit|vault|vikunja)
 		[[ "$ACTION" == "-r" ]] && serviceRestart "$OPTION";
 	    [[ "$ACTION" == "-s" ]] && serviceInspect "$OPTION";
 		[[ "$ACTION" == "-ss" ]] && serviceStartStop "$OPTION";
