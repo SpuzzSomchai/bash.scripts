@@ -2,7 +2,8 @@
 
 A small collection of `bash` scripts I created and use on a daily basis to perform tedious tasks. 
 
-> One I use the most if the `service-menu` script or `sm` for short to:
+One I use the most if the `service-menu` script or `sm` for short to:
+
 - start
 - restart
 - status
@@ -21,7 +22,7 @@ chmod +x [filename]
 
 ## Create Symbolic link
 
-- To create a new symbolic link, use the following command
+To create a new symbolic link, use the following command
 
 ```sh
 ln -s /srv/scripts/[script file] /usr/bin/[command]
