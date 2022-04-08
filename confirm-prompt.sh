@@ -1,6 +1,9 @@
 #!/bin/bash
 
 confirm() {
+#
+# syntax: confirm [<prompt>]
+#
 # Prompts the user to enter Yes or No and returns 0/1.
 
   local _prompt _default _response
@@ -24,12 +27,8 @@ confirm() {
   done
 }
 
-
-echo "Check for available disk space " && confirm "Please confirm"
-if [ $? -eq 0 ]; then
-    df -h
-fi
-
-
-
-
+# Example: 
+# echo "Check for available disk space " && confirm "Please confirm"
+# if [ $? -eq 0 ]; then
+#   df -h
+#fi

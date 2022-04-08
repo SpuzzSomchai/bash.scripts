@@ -6,25 +6,28 @@ else
 	ACTION="$1"
 fi
 clear;
+
+HDD_SPACE=$(df -h | grep "centos")
+
 echo ".__ .___.  . __..___.__ .  .   .  ..___"
 echo "|  \[__ \  /(__ [__ [__)\  /   |\/|[__ "
 echo "|__/[___ \/ .__)[___|  \ \/  * |  |[___"
-echo " "
+echo " ";
 echo " ";
 [[ "$ACTION" == "-r" ]] && echo "Select Service / Container to Restart";
 [[ "$ACTION" == "-s" ]] && echo "Select Service / Container Inspect or get Status";
 [[ "$ACTION" == "-ss" ]] && echo "Select Service / Container Start or Stop";
-echo "┌────────────────────────────────────────────────┐"
-echo "│ -ss	: Start / Stop Service or Container      │"
-echo "│ -r	: Restart Service or Container           │"
-echo "│ -s	: Get the Status of Service or Container │"
-echo "│ -rs 	: Show all Active and Running Services   │"
-echo "│ -es 	: Show all Active but Exited Services    │"
-echo "│ -rc 	: Show all Active and Running Containers │"
-echo "│ -ec 	: Show all Active but Stopped Containers │"
-echo "└────────────────────────────────────────────────┘"
-
-
+echo "┌────────────────────────────────────────────────┐";
+echo "│ -ss	: Start / Stop Service or Container      │";
+echo "│ -r	: Restart Service or Container           │";
+echo "│ -s	: Get the Status of Service or Container │";
+echo "│ -rs 	: Show all Active and Running Services   │";
+echo "│ -es 	: Show all Active but Exited Services    │";
+echo "│ -rc 	: Show all Active and Running Containers │";
+echo "│ -ec 	: Show all Active but Stopped Containers │";
+echo "╘════════════════════════════════════════════════╛";
+echo $HDD_SPACE
+echo " ";
 function serviceStartStop {
    STATUS=$(systemctl status "$1" | grep Active | awk '{print $2}')
    echo "$1 is currently $STATUS";
@@ -86,16 +89,16 @@ function dockerInspect {
 [[ "$ACTION" == "-ec" ]] && docker ps --filter "status=exited"
 
 
-select OPTION in code-server cockpit cloud9 cloudcmd couchDb cockpit containerd dashboard docker droppy fail2ban flamedashboard heimdall httpd mariadb nginx n8n portainer paperwork samba rstudio-server snippetbox tomcat organizr vikunja EXIT
+select OPTION in coder-cloud-redirect code-server cockpit cloud9 cloudcmd cockpit containerd dashboard docker droppy fail2ban flamedashboard heimdall hoppscotch httpd mattermost mariadb nginx n8n paperwork proxyManager nginxproxy_db_1 portainer postgresql-14 redis smb nmb rstudio-server tomcat organizr EXIT
 do
 	case $OPTION in 
-	httpd|samba|mariadb|nginx|cloudcmd|code-server|cockpit|containerd|docker|fail2ban|tomcat|rstudio-server|vault|vikunja)
+	coder-cloud-redirect|cockpit|code-server|docker|containerd|docker|fail2ban|httpd|mattermost|mariadb|nginx|postgresql-14|redis|smb|nmb|tomcat|rstudio-server|vault)
 		[[ "$ACTION" == "-r" ]] && serviceRestart "$OPTION";
 	    [[ "$ACTION" == "-s" ]] && serviceInspect "$OPTION";
 		[[ "$ACTION" == "-ss" ]] && serviceStartStop "$OPTION";
 		break
    ;;
-	portainer|paperwork|droppy|snippetbox|organizr|heimdall|couchDb|dashboard|flamedashboard|cloud9)
+	cloud9|dashboard|droppy|flamedashboard|heimdall|hoppscotch|organizr|paperwork|portainer|proxyManager|nginxproxy_db_1)
 		[[ "$ACTION" == "-r" ]] && dockerRestart "$OPTION";
 		[[ "$ACTION" == "-s" ]] && dockerInspect "$OPTION";
 		[[ "$ACTION" == "-ss" ]] && dockerStartStop "$OPTION";
