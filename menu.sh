@@ -15,10 +15,10 @@ select OPTION in $SERVICES; do
          serviceStatus $OPTION $STATUS 
       fi
       if [ "$STATUS" == "active" ]; then
-
+         :
       fi
       if [ "$STATUS" == "active" ]; then
-
+         :
       fi
    ;;
    2)
